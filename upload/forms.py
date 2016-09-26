@@ -5,6 +5,3 @@ class DocumentForm(forms.Form):
     docfile = forms.FileField(
         label='Select a document request to upload'
     )
-
-class RSinfo(forms.Form):
-    pass
