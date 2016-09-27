@@ -247,6 +247,11 @@ class Runsheet:
                 if f.tell() & 1:
                     f.write(b"\0")
 
+    def archive(self):
+        out = self.base+str(self.runsheet_id)
+        make_archive(out, 'zip', self.temp)
+        return out
+
     def create_runsheet(self):
         workbook = xlsxwriter.Workbook(self.temp+str(self.runsheet_id)+".xlsx")
 

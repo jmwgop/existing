@@ -6,8 +6,12 @@ from django.core.urlresolvers import reverse
 from django.views.generic import FormView
 from django.contrib.auth.decorators import login_required
 
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
+
 from sendfile import sendfile
-import os, magic, shutil
+import os, magic, shutil, xlrd, psycopg2, datetime
 from glob import iglob, glob
 
 from .doc_pull import Runsheet
@@ -19,14 +23,32 @@ def list(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-            newdoc = Document(docfile = request.FILES['docfile'])
             mime = magic.from_buffer(request.FILES['docfile'].read(), mime=True)
             if mime == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                newdoc.save()
+                basename = "process"
+                suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")+".xlsx"
+                filename = "_".join([basename, suffix]) # e.g. 'mylogfile_120508_171442'
+                file_obj = request.FILES['docfile']
+                with open(default_storage.path('tmp/'+filename), 'wb+') as destination:
+                    for chunk in file_obj.chunks():
+                        destination.write(chunk)
+                runsheet = Runsheet(default_storage.path('tmp/'+filename))
+                runsheet.create_request()
+                for x in runsheet.instrument:
+                    did = x['did']
+                    saveas_1 = x['saveas']
+                    print(did, saveas_1)
+                    if did != '':
+                        try:
+                            runsheet.grab_img(did, saveas_1)
+                        except:
+                            pass
+                    else:
+                        pass
+                runsheet.create_runsheet()
+                runsheet.archive()
             else:
                 return render(request, 'upload/error.html')
-            path = request.FILES['docfile']
-            print(path)
     else:
         form = DocumentForm() # A empty, unbound form
     # Render list page with the form
