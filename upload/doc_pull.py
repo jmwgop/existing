@@ -209,6 +209,12 @@ class Runsheet:
         self.temp = self.base + str(self.runsheet_id) + "/"
         self.dest = self.temp + "Documents/"
         self.conn.commit()
+        return self.runsheet_id
+
+    def archive(self):
+        out = self.base+str(self.runsheet_id)
+        make_archive(out, 'zip', self.temp)
+        return out
 
     def create_folder(self):
         if not os.path.exists(self.dest):
@@ -246,11 +252,6 @@ class Runsheet:
                 last_link = tif.im.last_linkoffset
                 if f.tell() & 1:
                     f.write(b"\0")
-
-    def archive(self):
-        out = self.base+str(self.runsheet_id)
-        make_archive(out, 'zip', self.temp)
-        return out
 
     def create_runsheet(self):
         workbook = xlsxwriter.Workbook(self.temp+str(self.runsheet_id)+".xlsx")

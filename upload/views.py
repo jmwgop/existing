@@ -10,8 +10,8 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 
-from sendfile import sendfile
 import os, magic, shutil, xlrd, psycopg2, datetime
+import io
 from glob import iglob, glob
 
 from .doc_pull import Runsheet
@@ -26,14 +26,15 @@ def list(request):
             mime = magic.from_buffer(request.FILES['docfile'].read(), mime=True)
             if mime == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 basename = "process"
-                suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")+".xlsx"
-                filename = "_".join([basename, suffix]) # e.g. 'mylogfile_120508_171442'
+                suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")\
+                        +".xlsx"
+                filename = "_".join([basename, suffix])
                 file_obj = request.FILES['docfile']
                 with open(default_storage.path('tmp/'+filename), 'wb+') as destination:
                     for chunk in file_obj.chunks():
                         destination.write(chunk)
                 runsheet = Runsheet(default_storage.path('tmp/'+filename))
-                runsheet.create_request()
+                runsheet_id = runsheet.create_request()
                 for x in runsheet.instrument:
                     did = x['did']
                     saveas_1 = x['saveas']
@@ -47,6 +48,8 @@ def list(request):
                         pass
                 runsheet.create_runsheet()
                 runsheet.archive()
+                shutil.rmtree(default_storage.path('runsheets/'+str(runsheet_id)+"/"))
+                os.remove(default_storage.path('tmp/'+filename))
             else:
                 return render(request, 'upload/error.html')
     else:
@@ -57,19 +60,3 @@ def list(request):
 
 def process():
     pass
-    # path = '/home/jmwgop/midland/midland/media/documents/**/*.xlsx'
-    # for filename in iglob(path, recursive=True):
-    #     runsheet = Runsheet(filename)
-    #     runsheet.create_request()
-    #     for x in runsheet.instrument:
-    #         did = x["did"]
-    #         saveas = x["saveas"]
-    #         runsheet.grab_img(did, saveas)
-    #     runsheet.create_runsheet()
-    #     out = "/home/jmwgop/midland/midland/media/runsheets/"+str(runsheet.runsheet_id)
-    #     filename_1 = shutil.make_archive(out, 'zip', runsheet.temp)
-    #     os.remove(filename)
-    #     shutil.rmtree(out)
-    #     return sendfile(request, filename_1)
-    # return render_to_response(
-    #     'upload/processed.html')
