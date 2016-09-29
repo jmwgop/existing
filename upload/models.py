@@ -8,8 +8,14 @@ class Document(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
     created = models.DateTimeField(auto_now_add=True)
 
+class RunReq(models.Model):
+    pull_id = models.AutoField(primary_key=True)
+    landman = models.IntegerField()
+    document_count = models.IntegerField()
+    created = models.DateTimeField()
+
 class RunRequestDocs(models.Model):
-    request_id = models.IntegerField()
+    pull_id = models.IntegerField()
     volume = models.CharField(max_length=4)
     page = models.CharField(max_length=4)
     rec_type = models.CharField(max_length=4)

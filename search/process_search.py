@@ -12,85 +12,32 @@ from shutil import make_archive
 import tiffany
 import datetime
 
-class Runsheet:
+class Query:
 
     img_source = r"/home/jmwgop/midland/midland/media/images/Midland Raw/MidlandTX"
     base = '/home/jmwgop/midland/midland/media/runsheets/'
 
-    def __init__(self, xls_file):
+    def __init__(self, block, subdivision):
+        self.instrument = []
         try:
-            self.conn = psycopg2.connect("dbname='midland_index' user='postgres' \
-                                    host='192.168.1.20' password='Chlstdow2'"
+            self.conn = psycopg2.connect("dbname='midland_index'                user='postgres' host='192.168.1.20' password='Chlstdow2'"
                                     )
             self.cur = self.conn.cursor()
         except:
             print("Error Connecting")
-        self.path = xls_file
-        workbook = xlrd.open_workbook(self.path)
-        sheet = workbook.sheet_by_index(0)
-        self.data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)]
-                for r in range(sheet.nrows)
-                ]
-        self.doc_count = sheet.nrows - 1
-        self.instrument = []
-        for x in range(1, 1+self.doc_count):
-            if self.data[x][2]:
-                self.rec_type = str(self.data[x][2])
-                self.doc_num = ''
-                self.year = ''
-                if self.data[x][0]:
-                    self.volume = str(int(self.data[x][0]))
-                    if self.data[x][1]:
-                        self.page = str(int(self.data[x][1]))
-                    else:
-                        self.page = ''
-                else:
-                    self.volume = ''
-            else:
-                self.volume = ''
-                self.page = ''
-                self.rec_type = ''
-                if self.data[x][0]:
-                    self.year = int(self.data[x][0])
-                    if self.data[x][1]:
-                        self.doc_num = str(int(self.data[x][1]))
-                    else:
-                        self.doc_num = ''
-                else:
-                    self.year = ''
-            if self.rec_type != '':
-                # vol and page in the datbase have leading zeros to make them 4 digits.
-                # Adding leading digits for search
-                self.vol = self.volume.zfill(5)
-                self.pg = self.page.zfill(4)
-                self.rec_type = self.rec_type.upper()
-                query1 = "Select vp_index_id from public.vp_doc where volume = (%s) and page = (%s) and rec_type = (%s);"
-                # vol, page, and rec_type are all being fed in from an excel spreadsheet in this version.
-                query2 = (self.vol, self.pg, self.rec_type)
-                try:
-                    self.cur.execute(query1,query2)
-                except:
-                    print("error")
-                try:
-                    self.did = self.cur.fetchone()[0]
-                except:
-                    self.did = ""
-            else:
-                query1 = "Select vp_index_id from public.vp_doc where year = (%s) \
-                            and doc_num = (%s);"
-                query2 = (self.year, self.doc_num)
-                try:
-                    self.cur.execute(query1,query2)
-                except:
-                    print("error")
-                try:
-                    self.did = self.cur.fetchone()[0]
-                except:
-                    self.did = ''
-            if self.did != '':
-                queryconstant = "Select doc_type, file_date, instrument_date \
+        query1 = "Select vp_index_id from public.legal_index where block = (%s) and addition_name ILIKE (%s);"
+        query2 = (block, subdivision,)
+        self.cur.execute(query1, query2)
+        self.did = []
+        for records in self.cur.fetchall():
+            self.did.append(records[0])
+        self.doc_count = 0
+        for z in self.did:
+            self.doc_count+=1
+            if z != '':
+                queryconstant = "Select doc_type\
                                 from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
+                querya = (z,)
                 try:
                     self.cur.execute(queryconstant, querya)
                 except:
@@ -100,9 +47,71 @@ class Runsheet:
                 except:
                     self.doc_type = ''
 
+
+                querycons = "Select page \
+                                from public.vp_doc where vp_index_id = (%s);"
+                querya = (z,)
+                try:
+                    self.cur.execute(querycons, querya)
+                except:
+                    pass
+                try:
+                    self.page = int(self.cur.fetchone()[0])
+                except:
+                    self.page = ''
+
+                querycons = "Select rec_type \
+                                from public.vp_doc where vp_index_id = (%s);"
+                querya = (z,)
+                try:
+                    self.cur.execute(querycons, querya)
+                except:
+                    pass
+                try:
+                    self.rec_type = self.cur.fetchone()[0]
+                except:
+                    self.rec_type = ''
+
+                querycons = "Select volume \
+                                from public.vp_doc where vp_index_id = (%s);"
+                querya = (z,)
+                try:
+                    self.cur.execute(querycons, querya)
+                except:
+                    pass
+                try:
+                    self.volume = int(self.cur.fetchone()[0])
+                except:
+                    self.volume = ''
+
+
+                querycons = "Select year \
+                                from public.vp_doc where vp_index_id = (%s);"
+                querya = (z,)
+                try:
+                    self.cur.execute(querycons, querya)
+                except:
+                    pass
+                try:
+                    self.year = int(self.cur.fetchone()[0])
+                except:
+                    self.year = ''
+
+                querycons = "Select doc_num \
+                                from public.vp_doc where vp_index_id = (%s);"
+                querya = (z,)
+                try:
+                    self.cur.execute(querycons, querya)
+                except:
+                    pass
+                try:
+                    self.doc_num = int(self.cur.fetchone()[0])
+                except:
+                    self.doc_num = ''
+
                 querycons = "Select file_date \
                                 from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
+                querya = (z,)
                 try:
                     self.cur.execute(querycons, querya)
                 except:
@@ -114,7 +123,7 @@ class Runsheet:
 
                 querycon = "Select instrument_date \
                                 from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
+                querya = (z,)
                 try:
                     self.cur.execute(querycon, querya)
                 except:
@@ -197,7 +206,7 @@ class Runsheet:
                 self.saveas = str(self.volume) + "-" + str(self.page) + "-" \
                                     + str(self.rec_type) + ".tif"
 
-            self.instrument.append({"did" : self.did,
+            self.instrument.append({"did" : z,
                                     "volume" : self.volume,
                                     "page" : self.page,
                                     "rec_type" : self.rec_type,
@@ -246,10 +255,10 @@ class Runsheet:
         self.create_folder()
         # temp = self.temp
         # year is the subfolder, img_name is the file name.
-        query3 = "select img_path from img_links \
+        query3 = "select img_path from img_index \
                     where vp_index_id = (%s) ORDER BY img_path;"
         query4 = (did,)
-        if did != "":
+        if did != "" and saveas_1 != '--None.tif':
             try:
                 self.cur.execute(query3,query4)
             except:
@@ -264,16 +273,16 @@ class Runsheet:
                     image_names.append(source)
             except:
                 pass
-        last_link = None
-        with open(self.dest+saveas_1, "wb") as f:
-            for file in image_names:
-                tif = tiffany.open(file)
-                if last_link:
-                    tif.im.last_linkoffset = last_link
-                tif.save(f)
-                last_link = tif.im.last_linkoffset
-                if f.tell() & 1:
-                    f.write(b"\0")
+            last_link = None
+            with open(self.dest+saveas_1, "wb") as f:
+                for file in image_names:
+                    tif = tiffany.open(file)
+                    if last_link:
+                        tif.im.last_linkoffset = last_link
+                    tif.save(f)
+                    last_link = tif.im.last_linkoffset
+                    if f.tell() & 1:
+                        f.write(b"\0")
 
     def create_runsheet(self):
         workbook = xlsxwriter.Workbook(self.temp+str(self.runsheet_id)+".xlsx")

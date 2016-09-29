@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Abstract{% endblock %}
+
+{% block content %}
+
+    <body>
+        <form action="/search/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>
+                {{ form.non_field_errors }}
+            </p>
+            <p>
+                {{ form.subdivision.label_tag }} {{ form.subdivision.help_text }}
+            </p>
+            <p>
+                {{ form.subdivision.errors }}
+                {{ form.subdivision }}
+            </p>
+            <p>
+                {{ form.block.label_tag }} {{ form.block.help_text }}
+            </p>
+            <p>
+                {{ form.block.errors }}
+                {{ form.block }}
+            </p>
+            <p><input type="submit" value="Perform Abstract Search" /></p>
+        </form>
+    </body>
+
+{% endblock content %}

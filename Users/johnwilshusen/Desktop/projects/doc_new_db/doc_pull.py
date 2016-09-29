@@ -87,6 +87,8 @@ class Runsheet:
                     self.did = self.cur.fetchone()[0]
                 except:
                     self.did = ''
+            if self.did == '':
+                print('blankdid')
             if self.did != '':
                 queryconstant = "Select doc_type, file_date, instrument_date \
                                 from public.constant_index where vp_index_id = (%s);"
@@ -99,28 +101,12 @@ class Runsheet:
                     self.doc_type = self.cur.fetchone()[0].title()
                 except:
                     self.doc_type = ''
-
-                querycons = "Select file_date \
-                                from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
                 try:
-                    self.cur.execute(querycons, querya)
-                except:
-                    pass
-                try:
-                    self.file_date = self.cur.fetchone()[0]
+                    self.file_date = self.cur.fetchone()[1]
                 except:
                     self.file_date = ''
-
-                querycon = "Select instrument_date \
-                                from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
                 try:
-                    self.cur.execute(querycon, querya)
-                except:
-                    pass
-                try:
-                    self.instrument_date = self.cur.fetchone()[0]
+                    self.instrument_date = self.cur.fetchone()[2]
                 except:
                     self.instrument_date = ''
 
@@ -188,7 +174,7 @@ class Runsheet:
                 self.legal_1 = ""
                 self.grantee_1 = ""
                 self.grantor_1 = ""
-                file_date = ""
+                self.file_date = ""
                 self.doc_type = ""
                 self.instrument_date = ""
             if self.rec_type == '':

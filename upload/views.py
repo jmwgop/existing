@@ -34,11 +34,11 @@ def list(request):
                     for chunk in file_obj.chunks():
                         destination.write(chunk)
                 runsheet = Runsheet(default_storage.path('tmp/'+filename))
-                runsheet_id = runsheet.create_request()
+                landman_1 = request.user.id
+                runsheet_id = runsheet.create_request(landman_1)
                 for x in runsheet.instrument:
                     did = x['did']
                     saveas_1 = x['saveas']
-                    print(did, saveas_1)
                     if did != '':
                         try:
                             runsheet.grab_img(did, saveas_1)
@@ -56,7 +56,6 @@ def list(request):
         form = DocumentForm() # A empty, unbound form
     # Render list page with the form
     return render(request, 'upload/list.html', {'form': form})
-
 
 def process():
     pass

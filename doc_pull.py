@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import xlrd
 import psycopg2
@@ -19,8 +17,8 @@ class Runsheet:
 
     def __init__(self, xls_file):
         try:
-            self.conn = psycopg2.connect("dbname='midland_index' user='postgres' \
-                                    host='192.168.1.20' password='Chlstdow2'"
+            self.conn = psycopg2.connect("dbname='midland_dr' user='postgres' \
+                                    host='localhost' password='Chlstdow2'"
                                     )
             self.cur = self.conn.cursor()
         except:
@@ -61,77 +59,64 @@ class Runsheet:
             if self.rec_type != '':
                 # vol and page in the datbase have leading zeros to make them 4 digits.
                 # Adding leading digits for search
-                self.vol = self.volume.zfill(5)
-                self.pg = self.page.zfill(4)
+                vol = self.volume.zfill(4)
+                pg = self.page.zfill(4)
                 self.rec_type = self.rec_type.upper()
-                query1 = "Select vp_index_id from public.vp_doc where volume = (%s) and page = (%s) and rec_type = (%s);"
-                # vol, page, and rec_type are all being fed in from an excel spreadsheet in this version.
-                query2 = (self.vol, self.pg, self.rec_type)
+                query1 = "Select did from deed_records.vp_doc where volume \
+                            = (%s) and page = (%s) and rec_type = (%s);"
+                # vol, page, and rec_type are all being fed in from an excel spreadsheet
+                # in this version.
+                query2 = (vol, pg, self.rec_type)
                 try:
                     self.cur.execute(query1,query2)
                 except:
-                    print("error")
+                    pass
                 try:
                     self.did = self.cur.fetchone()[0]
                 except:
                     self.did = ""
             else:
-                query1 = "Select vp_index_id from public.vp_doc where year = (%s) \
+                doc_num1 = self.doc_num.zfill(8)
+                query1 = "Select did from deed_records.vp_doc where year = (%s) \
                             and doc_num = (%s);"
-                query2 = (self.year, self.doc_num)
+                query2 = (self.year, doc_num1)
                 try:
                     self.cur.execute(query1,query2)
                 except:
-                    print("error")
+                    pass
                 try:
                     self.did = self.cur.fetchone()[0]
                 except:
                     self.did = ''
             if self.did != '':
                 queryconstant = "Select doc_type, file_date, instrument_date \
-                                from public.constant_index where vp_index_id = (%s);"
+                                from deed_records.index_constants where did = (%s);"
                 querya = (self.did,)
                 try:
                     self.cur.execute(queryconstant, querya)
                 except:
-                    print("error")
+                    pass
                 try:
-                    self.doc_type = self.cur.fetchone()[0].title()
+                    self.doc_type = self.cur.fetchone()[0]
                 except:
                     self.doc_type = ''
-
-                querycons = "Select file_date \
-                                from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
                 try:
-                    self.cur.execute(querycons, querya)
-                except:
-                    pass
-                try:
-                    self.file_date = self.cur.fetchone()[0]
+                    self.file_date = self.cur.fetchone()[1]
                 except:
                     self.file_date = ''
-
-                querycon = "Select instrument_date \
-                                from public.constant_index where vp_index_id = (%s);"
-                querya = (self.did,)
                 try:
-                    self.cur.execute(querycon, querya)
-                except:
-                    pass
-                try:
-                    self.instrument_date = self.cur.fetchone()[0]
+                    self.instrument_date = self.cur.fetchone()[2]
                 except:
                     self.instrument_date = ''
 
-                query_grantor = "Select grantor from public.grantor_index \
-                                where vp_index_id = (%s);"
-                query_grantee  = "Select grantee from public.grantee_index \
-                                where vp_index_id = (%s);"
-                query_legal = "Select legal from public.legal_index where \
-                                vp_index_id = (%s);"
-                query_img = "select img_path from public.img_index \
-                            where vp_index_id = (%s);"
+                query_grantor = "Select grantor from deed_records.grantor_index \
+                                where did = (%s);"
+                query_grantee  = "Select grantee from deed_records.grantee_index \
+                                where did = (%s);"
+                query_legal = "Select legal from deed_records.legal_index where \
+                                did = (%s);"
+                query_img = "select year, img_name from deed_records.img_links \
+                            where did = (%s);"
                 try:
                     self.cur.execute(query_grantor, querya)
                 except:
@@ -141,7 +126,7 @@ class Runsheet:
                 self.grantor = []
                 try:
                     for x in self.cur:
-                        self.grantor.append(x[0].title())
+                        self.grantor.append(x[0])
                 except:
                     pass
                 self.grantor_1 = " \n".join(self.grantor)
@@ -154,7 +139,7 @@ class Runsheet:
                 self.grantee = []
                 try:
                     for x in self.cur:
-                        self.grantee.append(x[0].title())
+                        self.grantee.append(x[0])
                 except:
                     pass
                 self.grantee_1 = " \n".join(self.grantee)
@@ -167,7 +152,7 @@ class Runsheet:
                 self.legal = []
                 try:
                     for x in self.cur:
-                        self.legal.append(x[0].title())
+                        self.legal.append(x[0])
                 except:
                     pass
                 self.legal_1 = " \n".join(self.legal)
@@ -180,7 +165,7 @@ class Runsheet:
                 self.img_page = []
                 try:
                     for x in self.cur:
-                        self.img_page.append(x[0].title())
+                        self.img_page.append(str(x[0])+"/"+x[1])
                 except:
                     pass
             else:
@@ -188,9 +173,10 @@ class Runsheet:
                 self.legal_1 = ""
                 self.grantee_1 = ""
                 self.grantor_1 = ""
-                file_date = ""
+                self.file_date = ""
                 self.doc_type = ""
                 self.instrument_date = ""
+
             if self.rec_type == '':
                 self.saveas = str(self.year) + "-" + str(self.doc_num) + ".tif"
             else:
@@ -246,8 +232,8 @@ class Runsheet:
         self.create_folder()
         # temp = self.temp
         # year is the subfolder, img_name is the file name.
-        query3 = "select img_path from img_links \
-                    where vp_index_id = (%s) ORDER BY img_path;"
+        query3 = "select img_path from deed_records.img_links \
+                    where did = (%s) ORDER BY img_path;"
         query4 = (did,)
         if did != "":
             try:

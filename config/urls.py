@@ -22,7 +22,9 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
-    url(r'^upload/', include('upload.urls')),
+    url(r'^upload/', include('upload.urls'), name='upload'),
+    url(r'^search/', include('search.urls'), name='search'),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
