@@ -20,7 +20,7 @@ class Query:
     def __init__(self, block, subdivision):
         self.instrument = []
         try:
-            self.conn = psycopg2.connect("dbname='midland_index'                user='postgres' host='192.168.1.20' password='Chlstdow2'"
+            self.conn = psycopg2.connect("dbname='midland_index' user='postgres' host='192.168.1.20' password='Chlstdow2'"
                                     )
             self.cur = self.conn.cursor()
         except:
@@ -72,6 +72,7 @@ class Query:
                 except:
                     self.rec_type = ''
 
+
                 querycons = "Select volume \
                                 from public.vp_doc where vp_index_id = (%s);"
                 querya = (z,)
@@ -93,7 +94,7 @@ class Query:
                 except:
                     pass
                 try:
-                    self.year = int(self.cur.fetchone()[0])
+                    self.year = self.cur.fetchone()[0]
                 except:
                     self.year = ''
 
@@ -105,7 +106,7 @@ class Query:
                 except:
                     pass
                 try:
-                    self.doc_num = int(self.cur.fetchone()[0])
+                    self.doc_num = self.cur.fetchone()[0]
                 except:
                     self.doc_num = ''
 
@@ -200,7 +201,7 @@ class Query:
                 file_date = ""
                 self.doc_type = ""
                 self.instrument_date = ""
-            if self.rec_type == '':
+            if self.rec_type is None:
                 self.saveas = str(self.year) + "-" + str(self.doc_num) + ".tif"
             else:
                 self.saveas = str(self.volume) + "-" + str(self.page) + "-" \
@@ -375,7 +376,7 @@ class Query:
                     worksheet.write_datetime(y, 4, x["file_date"], date_format)
                 except:
                     pass
-            if x["rec_type"] == '':
+            if x["rec_type"] is None:
                 worksheet.write(y, 5, x["year"], formcells)
                 worksheet.write(y, 6, x["doc_num"], formcells)
                 save = str(x["year"])+"-"+str(x["doc_num"])+".tif"
