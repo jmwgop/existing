@@ -8,8 +8,6 @@ import os, magic, shutil, xlrd, datetime
 from .forms import SearchForm
 from search.process_search import Query
 
-
-
 @login_required(login_url='/accounts/login/')
 def initial(request):
     if request.method == 'POST':
