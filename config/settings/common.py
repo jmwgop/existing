@@ -48,6 +48,7 @@ LOCAL_APPS = (
     'upload',
     'invoices',
     'contacts',
+    'tracts',
     'midland.users.apps.UsersConfig',
     # Your stuff: custom apps go here
 )
