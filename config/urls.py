@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
-
+from tracts.views import TractList
 
 
 
@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
 
     # Your stuff: custom urls includes go here
+
+    url(r'^tract/list/$', TractList.as_view(), name='tract_list'),
     url(r'^upload/', include('upload.urls'), name='upload'),
     url(r'^search/', include('search.urls'), name='search'),
     url(r'^invoices/', include('invoices.urls'), name='invoices'),
