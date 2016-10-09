@@ -1,0 +1,21 @@
+<div class="gi-header">
+    <h3 class="ad-mh">{{ tract.short_legal }}
+        {# Tract Edit Link #}
+        <span>
+            <a class="ad-control edit-tract btn btn-link"
+               href="">Edit</a>
+        </span>
+    </h3>
+
+</div>
+<div class="row gi-body">
+    <div class="col-md-9">
+        <h5 class="gi-sh">Description</h5>
+        <p>{{ tract.full_legal }}</p>
+    </div>
+    <div class="col-md-3">
+        <h5 class="gi-sh">Address</h5>
+        <p class="nm">{{ tract.situs_address }}</p>
+        <p class="nm">{{ tract.city}}, {{ tract.state }}, {{tract.zip_code}}</p>
+    </div>
+</div>

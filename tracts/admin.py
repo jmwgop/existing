@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Tracts
+from .models import Tract
 
-admin.site.register(Tracts)
+admin.site.register(Tract)
 
 # Register your models here.

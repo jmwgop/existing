@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Tract List{% endblock title %}
+
+{% block content %}
+    <div id="content-container" class="container p-none">
+        <div id="al-container" class="side-p">
+            <div id="al-control">
+                <h3 class="ad-mh">Tract List
+                    {# Add Tract Link #}
+                </h3>
+                {# Tract Search Form #}
+                <form action="{% url 'tract_list' %}" method="get">
+                    <input id="al-search" type="text"
+                           name="tract" value="{{ request.GET.tract }}"
+                           class="form-control" />
+                    <input type="submit"
+                           value="Search" class="btn btn-success" />
+                </form>
+            </div>
+            {# List of Tracts #}
+            <ul id="al-group" class="strip-list">
+                {% for tract in tracts %}
+                    <li class="al-item">
+                        <a href="{{ tract.get_absolute_url }}"><h4 class="al-name">{{ tract.short_legal }}</h4></a>
+                        <span class="al-created">created on {{ tract.created_on }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            {# Pagination Section #}
+            {% if is_paginated %}
+                <div id="al-paginate">
+                    <ul class="strip-list al-pgnt-list">
+                        {% if page_obj.has_previous %}
+                            <li class="pull-left">
+                                <a href="{% url 'tract_list' %}?page={{ page_obj.previous_page_number }}
+                                {% if request.GET.tract %}&tract={{ request.GET.tract }}{% endif %}">Prev</a>
+                            </li>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <li class="pull-right">
+                                <a href="{% url 'tract_list' %}?page={{ page_obj.next_page_number }}
+                                {% if request.GET.tract %}&tract={{ request.GET.tract }}{% endif %}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

@@ -10,7 +10,6 @@ from django.views import defaults as default_views
 from tracts.views import TractList
 
 
-
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
 
@@ -24,6 +23,7 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
 
     url(r'^tract/list/$', TractList.as_view(), name='tract_list'),
+    url(r'^tract/(?P<uuid>[\w-]+)/', include('tracts.urls')),
     url(r'^upload/', include('upload.urls'), name='upload'),
     url(r'^search/', include('search.urls'), name='search'),
     url(r'^invoices/', include('invoices.urls'), name='invoices'),

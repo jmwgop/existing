@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from shortuuidfield import ShortUUIDField
 
-class Tracts(models.Model):
+class Tract(models.Model):
     uuid = ShortUUIDField(unique=True)
     short_legal = models.CharField(max_length=100)
     full_legal = models.TextField(blank=True)
