@@ -46,6 +46,8 @@ LOCAL_APPS = (
     # custom users app
     'search',
     'upload',
+    'invoices',
+    'contacts',
     'midland.users.apps.UsersConfig',
     # Your stuff: custom apps go here
 )

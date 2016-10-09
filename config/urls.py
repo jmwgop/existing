@@ -24,8 +24,7 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     url(r'^upload/', include('upload.urls'), name='upload'),
     url(r'^search/', include('search.urls'), name='search'),
-
-
+    url(r'^invoices/', include('invoices.urls'), name='invoices'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

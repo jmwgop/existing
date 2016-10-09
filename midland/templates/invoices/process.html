@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Abstract{% endblock %}
+
+{% block content %}
+
+<body>
+
+
+<form enctype="multipart/form-data" action="/invoices/" method="post">
+  <input type="file" name="myfiles" multiple>
+  <input type="submit" name="upload" value="Upload">
+</form>
+
+    <!-- Upload form. Note enctype attribute! -->
+    <form action="/invoices/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            {{ form.non_field_errors }}
+        </p>
+        <p>
+            {{ form.file_field.label_tag }} {{ form.file_field.help_text }}
+        </p>
+        <p>
+            {{ form.file_field.errors }}
+            {{ form.file_field }}
+        </p>
+        <p><input type="submit" value="Upload Invoices" /></p>
+    </form>
+
+</body>
+
+{% endblock content %}
