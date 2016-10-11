@@ -6,13 +6,13 @@ class TractForm(forms.ModelForm):
     class Meta:
         model = Tract
         fields = ('short_legal', 'full_legal', 'situs_address',
-                  'city', 'state', 'zip_code',
+                  'city', 'state', 'zip_code', 'acreage', 'status',
         )
         widgets = {
             'short_legal': forms.TextInput(
                 attrs={
                     'placeholder':'Short Legal',
-                    'class':'col-md-12 form-control'
+                    'class':'form-control'
                 }
             ),
             'full_legal': forms.Textarea(
@@ -24,25 +24,37 @@ class TractForm(forms.ModelForm):
             'situs_address': forms.TextInput(
                 attrs={
                     'placeholder':'Situs Address',
-                    'class':'gi-form-addr form-control'
+                    'class':'form-control'
                 }
             ),
             'city': forms.TextInput(
                 attrs={
                     'placeholder':'City',
-                    'class':'gi-form-addr form-control'
+                    'class':'form-control'
                 }
             ),
             'state': forms.TextInput(
                 attrs={
                     'placeholder':'State',
-                    'class':'gi-form-addr form-control'
+                    'class':'form-control'
                 }
             ),
             'zip_code': forms.TextInput(
                 attrs={
                     'placeholder':'Zip Code',
-                    'class':'gi-form-addr form-control'
+                    'class':'form-control'
+                }
+            ),
+            'acreage': forms.TextInput(
+                attrs={
+                    'placeholder':'Acreage',
+                    'class':'form-control'
+                }
+            ),
+            'status': forms.TextInput(
+                attrs={
+                    'placeholder':'Status',
+                    'class':'form-control'
                 }
             ),
         }
