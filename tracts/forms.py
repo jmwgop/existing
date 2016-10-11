@@ -5,8 +5,8 @@ from .models import Tract
 class TractForm(forms.ModelForm):
     class Meta:
         model = Tract
-        fields = ('name', 'desc', 'address_one',
-                  'address_two', 'city', 'state', 'phone',
+        fields = ('short_legal', 'full_legal', 'situs_address',
+                  'city', 'state', 'zip_code',
         )
         widgets = {
             'short_legal': forms.TextInput(
@@ -39,7 +39,7 @@ class TractForm(forms.ModelForm):
                     'class':'gi-form-addr form-control'
                 }
             ),
-            'zip-code': forms.TextInput(
+            'zip_code': forms.TextInput(
                 attrs={
                     'placeholder':'Zip Code',
                     'class':'gi-form-addr form-control'

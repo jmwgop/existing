@@ -7,8 +7,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
-from tracts.views import TractList
-
+from tracts.views import TractList, tract_cru
+import tracts
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -23,6 +23,7 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
 
     url(r'^tract/list/$', TractList.as_view(), name='tract_list'),
+    url(r'^tract/new/$', tracts.views.tract_cru, name='tract_new'),
     url(r'^tract/(?P<uuid>[\w-]+)/', include('tracts.urls')),
     url(r'^upload/', include('upload.urls'), name='upload'),
     url(r'^search/', include('search.urls'), name='search'),

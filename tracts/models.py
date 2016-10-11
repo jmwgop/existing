@@ -5,14 +5,13 @@ from shortuuidfield import ShortUUIDField
 class Tract(models.Model):
     uuid = ShortUUIDField(unique=True)
     short_legal = models.CharField(max_length=100)
-    full_legal = models.TextField(blank=True)
+    full_legal = models.TextField()
     situs_address = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=2)
     zip_code = models.CharField(max_length=5)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
     created_on = models.DateField(auto_now_add=True)
-    gid = models.IntegerField()
 
     class Meta:
         verbose_name_plural = 'tracts'
