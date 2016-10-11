@@ -5,6 +5,8 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
+
 
 from .models import Tract
 from .forms import TractForm
@@ -45,22 +47,33 @@ def tract_detail(request, uuid):
     return render(request, 'tracts/tract_detail.html', variables)
 
 @login_required()
-def tract_cru(request):
+def tract_cru(request, uuid=None):
+    if uuid:
+        tract = get_object_or_404(Tract, uuid=uuid)
+        if tract.owner != request.user:
+            return HttpResponseForbidden()
+    else:
+        tract = Tract(owner=request.user)
+
     if request.POST:
-        form = TractForm(request.POST)
+        form = TractForm(request.POST, instance=tract)
         if form.is_valid():
             tract = form.save(commit=False)
-            tract.owner = request.owner
+            tract.owner = request.user
             tract.save()
             redirect_url = reverse('tract_detail', kwargs={'uuid': tract.uuid})
             return HttpResponseRedirect(redirect_url)
     else:
-        form = TractForm()
+        form = TractForm(instance=tract)
 
     variables = {
         'form': form,
+        'tract': tract
     }
+    if request.is_ajax():
+        template = 'tracts/tract_item_form.html'
+    else:
+        template = 'tracts/tract_cru.html'
 
-    template = 'tracts/tract_cru.html'
 
     return render(request, template, variables)

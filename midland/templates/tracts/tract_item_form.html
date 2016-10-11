@@ -1,5 +1,6 @@
 <form id="gi-form"
-      action="."
+      action="{% if tract.uuid %}
+      {{ tract.get_update_url }}{% else %}{% url 'tract_new' %}{% endif %}"
       method="post">
     {% csrf_token %}
     <div id="gi-h-w">
