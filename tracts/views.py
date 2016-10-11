@@ -46,13 +46,11 @@ def tract_detail(request, uuid):
 
 @login_required()
 def tract_cru(request):
-    owner = request.user
     if request.POST:
         form = TractForm(request.POST)
         if form.is_valid():
             tract = form.save(commit=False)
-            tract.owner = owner
-            print(tract.short_legal, tract.full_legal, tract.situs_address, tract.city, tract.state, tract.zip_code, tract.owner, tract.created_on)
+            tract.owner = request.owner
             tract.save()
             redirect_url = reverse('tract_detail', kwargs={'uuid': tract.uuid})
             return HttpResponseRedirect(redirect_url)

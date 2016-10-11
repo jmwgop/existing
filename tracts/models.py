@@ -10,7 +10,7 @@ class Tract(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=2)
     zip_code = models.CharField(max_length=5)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
     created_on = models.DateField(auto_now_add=True)
 
     class Meta:
