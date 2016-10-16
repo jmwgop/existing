@@ -39,6 +39,7 @@ def list(request):
                 for x in runsheet.instrument:
                     did = x['did']
                     saveas_1 = x['saveas']
+                    print(did, saveas_1)
                     if did != '':
                         try:
                             runsheet.grab_img(did, saveas_1)

@@ -249,14 +249,18 @@ class Runsheet:
                 pass
         # As parameters, pass the output file name, then the input file names in order.
             out = self.dest+saveas_1
-            with Image() as img:
-                try:
-                    img.sequence.extend( [ Image(filename=f)
-                                        for f in image_names
-                                        ] )
-                    img.save(filename=out)
-                except:
-                    pass
+            if len(image_names) > 0:
+                print(len(image_names), image_names)
+                with Image() as img:
+                    try:
+                        img.sequence.extend( [ Image(filename=f)
+                                            for f in image_names
+                                            ] )
+                        img.save(filename=out)
+                    except:
+                        pass
+            else:
+                pass
 
 
     def authorize(self, username1):
